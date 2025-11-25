@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Filter, RefreshCw, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const stories = [
   { key: "ABC-101", summary: "As a user, I want to login with email", score: 85, sprint: "Sprint 6", status: "Done", lastRated: "2 hours ago" },
@@ -18,6 +20,43 @@ const stories = [
 
 const Stories = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isReratingAll, setIsReratingAll] = useState(false);
+  const [reratingStory, setReratingStory] = useState<string | null>(null);
+
+  const handleRerateStory = (storyKey: string) => {
+    setReratingStory(storyKey);
+    toast({
+      title: "Re-rating story",
+      description: `Analyzing ${storyKey}...`,
+    });
+    
+    // Simulate AI rating process
+    setTimeout(() => {
+      setReratingStory(null);
+      toast({
+        title: "Story re-rated successfully",
+        description: `${storyKey} has been analyzed and scored.`,
+      });
+    }, 2000);
+  };
+
+  const handleRerateAll = () => {
+    setIsReratingAll(true);
+    toast({
+      title: "Re-rating all stories",
+      description: "This may take a few minutes...",
+    });
+    
+    // Simulate bulk rating process
+    setTimeout(() => {
+      setIsReratingAll(false);
+      toast({
+        title: "All stories re-rated",
+        description: `Successfully analyzed ${stories.length} stories.`,
+      });
+    }, 3000);
+  };
 
   return (
     <Layout>
@@ -44,9 +83,13 @@ const Stories = () => {
               <Filter className="w-4 h-4" />
               Filters
             </Button>
-            <Button className="gradient-primary text-white gap-2 shadow-custom-md">
-              <RefreshCw className="w-4 h-4" />
-              Re-rate All
+            <Button 
+              className="gradient-primary text-white gap-2 shadow-custom-md"
+              onClick={handleRerateAll}
+              disabled={isReratingAll}
+            >
+              <RefreshCw className={`w-4 h-4 ${isReratingAll ? 'animate-spin' : ''}`} />
+              {isReratingAll ? 'Re-rating...' : 'Re-rate All'}
             </Button>
           </div>
 
@@ -104,9 +147,18 @@ const Stories = () => {
                           <Eye className="w-4 h-4" />
                           View
                         </Button>
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <RefreshCw className="w-4 h-4" />
-                          Re-rate
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="gap-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRerateStory(story.key);
+                          }}
+                          disabled={reratingStory === story.key}
+                        >
+                          <RefreshCw className={`w-4 h-4 ${reratingStory === story.key ? 'animate-spin' : ''}`} />
+                          {reratingStory === story.key ? 'Rating...' : 'Re-rate'}
                         </Button>
                       </div>
                     </td>
