@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const dimensions = [
   { name: "Clarity", score: 85, weight: 25 },
@@ -26,9 +27,27 @@ const improvements = [
 const StoryDetail = () => {
   const navigate = useNavigate();
   const { storyKey } = useParams();
+  const { toast } = useToast();
   const [showComparison, setShowComparison] = useState(false);
+  const [isRerating, setIsRerating] = useState(false);
 
   const overallScore = 78;
+
+  const handleRerate = () => {
+    setIsRerating(true);
+    toast({
+      title: "Re-rating story",
+      description: `Analyzing ${storyKey || "story"}...`,
+    });
+    
+    setTimeout(() => {
+      setIsRerating(false);
+      toast({
+        title: "Story re-rated successfully",
+        description: `${storyKey || "Story"} has been analyzed and scored.`,
+      });
+    }, 2000);
+  };
 
   return (
     <Layout>
@@ -49,9 +68,14 @@ const StoryDetail = () => {
                 <ExternalLink className="w-4 h-4" />
                 Open in Jira
               </Button>
-              <Button variant="outline" className="gap-2">
-                <RefreshCw className="w-4 h-4" />
-                Re-rate Story
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={handleRerate}
+                disabled={isRerating}
+              >
+                <RefreshCw className={`w-4 h-4 ${isRerating ? 'animate-spin' : ''}`} />
+                {isRerating ? 'Re-rating...' : 'Re-rate Story'}
               </Button>
             </div>
           </div>
