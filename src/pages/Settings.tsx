@@ -9,7 +9,7 @@ import { Save, Key, Cpu, Shield, Users } from "lucide-react";
 const Settings = () => {
   return (
     <Layout>
-      <div className="p-8">
+      <div className="p-4 md:p-6 lg:p-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground mb-2">Settings</h1>
@@ -17,16 +17,16 @@ const Settings = () => {
         </div>
 
         <Tabs defaultValue="api" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl">
-            <TabsTrigger value="api">API Keys</TabsTrigger>
-            <TabsTrigger value="model">LLM Model</TabsTrigger>
-            <TabsTrigger value="rubric">Rubric</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 max-w-2xl">
+            <TabsTrigger value="api" className="text-xs md:text-sm">API Keys</TabsTrigger>
+            <TabsTrigger value="model" className="text-xs md:text-sm">LLM Model</TabsTrigger>
+            <TabsTrigger value="rubric" className="text-xs md:text-sm">Rubric</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs md:text-sm">Users</TabsTrigger>
           </TabsList>
 
           {/* API Keys */}
           <TabsContent value="api">
-            <div className="bg-card rounded-xl shadow-custom-md border border-border p-6">
+          <div className="bg-card rounded-xl shadow-custom-md border border-border p-4 md:p-6">
               <div className="flex items-center gap-3 mb-6">
                 <Key className="w-5 h-5 text-primary" />
                 <h2 className="text-xl font-semibold text-foreground">API Configuration</h2>
@@ -72,7 +72,7 @@ const Settings = () => {
 
           {/* LLM Model */}
           <TabsContent value="model">
-            <div className="bg-card rounded-xl shadow-custom-md border border-border p-6">
+          <div className="bg-card rounded-xl shadow-custom-md border border-border p-4 md:p-6">
               <div className="flex items-center gap-3 mb-6">
                 <Cpu className="w-5 h-5 text-primary" />
                 <h2 className="text-xl font-semibold text-foreground">LLM Model Selection</h2>
