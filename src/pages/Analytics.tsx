@@ -22,14 +22,14 @@ const issueBreakdown = [
 const Analytics = () => {
   return (
     <Layout>
-      <div className="p-8">
+      <div className="p-4 md:p-6 lg:p-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Analytics</h1>
-            <p className="text-muted-foreground">Deep insights into story quality trends</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Analytics</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Deep insights into story quality trends</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button variant="outline" className="gap-2">
               <Calendar className="w-4 h-4" />
               Date Range
@@ -44,9 +44,9 @@ const Analytics = () => {
         {/* Charts */}
         <div className="space-y-6">
           {/* Sprint Comparison */}
-          <div className="bg-card rounded-xl shadow-custom-md border border-border p-6">
-            <h3 className="text-lg font-semibold text-foreground mb-6">Sprint-over-Sprint Quality Improvement</h3>
-            <ResponsiveContainer width="100%" height={350}>
+        <div className="bg-card rounded-xl shadow-custom-md border border-border p-4 md:p-6">
+            <h3 className="text-base md:text-lg font-semibold text-foreground mb-6">Sprint-over-Sprint Quality Improvement</h3>
+            <ResponsiveContainer width="100%" height={300} className="text-xs md:text-sm">
               <LineChart data={sprintComparison}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="sprint" stroke="hsl(var(--muted-foreground))" />
@@ -78,11 +78,11 @@ const Analytics = () => {
             </ResponsiveContainer>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
             {/* Issue Breakdown */}
-            <div className="bg-card rounded-xl shadow-custom-md border border-border p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-6">Common Quality Issues</h3>
-              <ResponsiveContainer width="100%" height={300}>
+            <div className="bg-card rounded-xl shadow-custom-md border border-border p-4 md:p-6">
+              <h3 className="text-base md:text-lg font-semibold text-foreground mb-6">Common Quality Issues</h3>
+              <ResponsiveContainer width="100%" height={250} className="text-xs md:text-sm">
                 <PieChart>
                   <Pie
                     data={issueBreakdown}
@@ -110,9 +110,9 @@ const Analytics = () => {
             </div>
 
             {/* Team Performance */}
-            <div className="bg-card rounded-xl shadow-custom-md border border-border p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-6">Stories by Quality Band</h3>
-              <ResponsiveContainer width="100%" height={300}>
+            <div className="bg-card rounded-xl shadow-custom-md border border-border p-4 md:p-6">
+              <h3 className="text-base md:text-lg font-semibold text-foreground mb-6">Stories by Quality Band</h3>
+              <ResponsiveContainer width="100%" height={250} className="text-xs md:text-sm">
                 <BarChart
                   data={[
                     { band: "Excellent (80+)", count: 45 },

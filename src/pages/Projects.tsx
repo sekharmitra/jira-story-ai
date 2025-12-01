@@ -50,23 +50,23 @@ const Projects = () => {
 
   return (
     <Layout>
-      <div className="p-8">
+      <div className="p-4 md:p-6 lg:p-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Projects</h1>
-            <p className="text-muted-foreground">Manage your connected Jira projects</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Projects</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Manage your connected Jira projects</p>
           </div>
-          <Button onClick={handleAddProject} className="gradient-primary text-white gap-2 shadow-custom-md">
+          <Button onClick={handleAddProject} className="gradient-primary text-white gap-2 shadow-custom-md w-full md:w-auto">
             <Plus className="w-4 h-4" />
             Add Project
           </Button>
         </div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {projects.map((project) => (
-            <div key={project.key} className="bg-card rounded-xl shadow-custom-md border border-border p-6 hover:shadow-custom-lg transition-smooth">
+            <div key={project.key} className="bg-card rounded-xl shadow-custom-md border border-border p-4 md:p-6 hover:shadow-custom-lg transition-smooth">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-foreground mb-1">{project.name}</h3>
@@ -115,14 +115,14 @@ const Projects = () => {
         </div>
 
         {/* Onboarding Card */}
-        <div className="mt-8 bg-gradient-light rounded-xl shadow-custom-md border border-border p-8">
+        <div className="mt-6 md:mt-8 bg-gradient-light rounded-xl shadow-custom-md border border-border p-6 md:p-8">
           <div className="max-w-2xl">
-            <h2 className="text-2xl font-bold text-foreground mb-3">Ready to add more projects?</h2>
-            <p className="text-muted-foreground mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-foreground mb-3">Ready to add more projects?</h2>
+            <p className="text-sm md:text-base text-muted-foreground mb-6">
               Connect additional Jira projects to expand your AI-powered story rating capabilities. 
               Our 5-step wizard makes integration seamless and quick.
             </p>
-            <Button onClick={handleAddProject} className="gradient-primary text-white gap-2 shadow-custom-md">
+            <Button onClick={handleAddProject} className="gradient-primary text-white gap-2 shadow-custom-md w-full md:w-auto">
               <Plus className="w-4 h-4" />
               Start Project Setup
             </Button>

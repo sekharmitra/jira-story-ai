@@ -1,7 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { NavLink } from "@/components/NavLink";
-import { LayoutDashboard, FileText, FolderKanban, Settings, LogOut, BarChart3 } from "lucide-react";
+import { LayoutDashboard, FileText, FolderKanban, Settings, LogOut, BarChart3, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
 
 interface LayoutProps {
   children: ReactNode;
@@ -16,10 +17,37 @@ const navItems = [
 ];
 
 export const Layout = ({ children }: LayoutProps) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="min-h-screen flex w-full bg-background">
+      {/* Mobile Menu Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="bg-card shadow-custom-md"
+        >
+          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </Button>
+      </div>
+
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border flex flex-col shadow-custom-md">
+      <aside className={cn(
+        "fixed lg:static inset-y-0 left-0 z-40",
+        "w-64 bg-card border-r border-border flex flex-col shadow-custom-md",
+        "transform transition-transform duration-300 ease-in-out",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
         {/* Logo */}
         <div className="p-6 border-b border-border">
           <div className="flex items-center gap-3">
@@ -43,6 +71,7 @@ export const Layout = ({ children }: LayoutProps) => {
                 "flex items-center gap-3 px-4 py-3 rounded-lg transition-smooth text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
               activeClassName="bg-primary/10 text-primary font-medium hover:bg-primary/15"
+              onClick={() => setSidebarOpen(false)}
             >
               <item.icon className="w-5 h-5" />
               <span>{item.title}</span>
@@ -60,7 +89,7 @@ export const Layout = ({ children }: LayoutProps) => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto lg:ml-0 pt-16 lg:pt-0">
         {children}
       </main>
     </div>

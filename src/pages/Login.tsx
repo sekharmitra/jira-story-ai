@@ -13,14 +13,14 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 gradient-navy relative overflow-hidden">
+      <div className="hidden md:flex md:w-full lg:w-1/2 gradient-navy relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-accent rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary rounded-full blur-3xl"></div>
         </div>
-        <div className="relative z-10 flex flex-col justify-center items-start p-16 text-white">
+        <div className="relative z-10 flex flex-col justify-center items-start p-8 md:p-16 text-white">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-custom-xl">
               <BarChart3 className="w-10 h-10" />
@@ -30,10 +30,10 @@ const Login = () => {
               <p className="text-blue-light text-sm">for Jira</p>
             </div>
           </div>
-          <h2 className="text-4xl font-bold mb-6 leading-tight">
+          <h2 className="text-2xl md:text-4xl font-bold mb-6 leading-tight">
             Transform Your User Stories with AI-Powered Insights
           </h2>
-          <p className="text-lg text-blue-light opacity-90 max-w-md">
+          <p className="text-sm md:text-lg text-blue-light opacity-90 max-w-md">
             Automatically analyze, rate, and improve your Jira user stories with enterprise-grade AI technology.
           </p>
           <div className="mt-12 space-y-4">
@@ -54,12 +54,23 @@ const Login = () => {
       </div>
 
       {/* Right Panel - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-gradient-light">
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8 bg-gradient-light">
         <div className="w-full max-w-md">
-          <div className="bg-card rounded-2xl shadow-custom-xl p-8 border border-border">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Welcome back</h2>
-              <p className="text-muted-foreground">Sign in to your account to continue</p>
+          {/* Mobile Logo */}
+          <div className="md:hidden flex items-center justify-center gap-3 mb-8">
+            <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-custom-md">
+              <BarChart3 className="w-7 h-7 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold gradient-text">AI Story Rating</h1>
+              <p className="text-xs text-muted-foreground">for Jira</p>
+            </div>
+          </div>
+          
+          <div className="bg-card rounded-2xl shadow-custom-xl p-6 md:p-8 border border-border">
+            <div className="mb-6 md:mb-8">
+              <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">Welcome back</h2>
+              <p className="text-sm md:text-base text-muted-foreground">Sign in to your account to continue</p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-6">

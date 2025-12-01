@@ -32,14 +32,14 @@ const weakStories = [
 const Dashboard = () => {
   return (
     <Layout>
-      <div className="p-8">
+      <div className="p-4 md:p-6 lg:p-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 md:mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
-            <p className="text-muted-foreground">Monitor your user story quality and trends</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Monitor your user story quality and trends</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <Button variant="outline" className="gap-2">
               <Filter className="w-4 h-4" />
               Filter
@@ -52,7 +52,7 @@ const Dashboard = () => {
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <KPICard
             title="Avg Quality Score"
             value="78"
@@ -80,15 +80,15 @@ const Dashboard = () => {
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
           {/* Quality Distribution */}
-          <div className="bg-card rounded-xl p-6 shadow-custom-md border border-border">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Story Quality Distribution</h3>
+          <div className="bg-card rounded-xl p-4 md:p-6 shadow-custom-md border border-border">
+            <h3 className="text-base md:text-lg font-semibold text-foreground mb-4">Story Quality Distribution</h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={qualityDistribution}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="range" stroke="hsl(var(--muted-foreground))" />
-                <YAxis stroke="hsl(var(--muted-foreground))" />
+                <XAxis dataKey="range" stroke="hsl(var(--muted-foreground))" className="text-xs" />
+                <YAxis stroke="hsl(var(--muted-foreground))" className="text-xs" />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
@@ -102,13 +102,13 @@ const Dashboard = () => {
           </div>
 
           {/* Quality Trend */}
-          <div className="bg-card rounded-xl p-6 shadow-custom-md border border-border">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Quality Trend by Sprint</h3>
+          <div className="bg-card rounded-xl p-4 md:p-6 shadow-custom-md border border-border">
+            <h3 className="text-base md:text-lg font-semibold text-foreground mb-4">Quality Trend by Sprint</h3>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="sprint" stroke="hsl(var(--muted-foreground))" />
-                <YAxis stroke="hsl(var(--muted-foreground))" />
+                <XAxis dataKey="sprint" stroke="hsl(var(--muted-foreground))" className="text-xs" />
+                <YAxis stroke="hsl(var(--muted-foreground))" className="text-xs" />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
@@ -130,38 +130,38 @@ const Dashboard = () => {
 
         {/* Weakest Stories */}
         <div className="bg-card rounded-xl shadow-custom-md border border-border overflow-hidden">
-          <div className="p-6 border-b border-border">
-            <h3 className="text-lg font-semibold text-foreground">Stories Needing Attention</h3>
-            <p className="text-sm text-muted-foreground mt-1">Stories with the lowest quality scores</p>
+          <div className="p-4 md:p-6 border-b border-border">
+            <h3 className="text-base md:text-lg font-semibold text-foreground">Stories Needing Attention</h3>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1">Stories with the lowest quality scores</p>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="bg-muted/50 border-b border-border">
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Story Key</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Summary</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Score</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">Status</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-foreground">Actions</th>
+                  <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-foreground">Story Key</th>
+                  <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-foreground">Summary</th>
+                  <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-foreground">Score</th>
+                  <th className="px-4 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-foreground">Status</th>
+                  <th className="px-4 md:px-6 py-3 md:py-4 text-right text-xs md:text-sm font-semibold text-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {weakStories.map((story) => (
                   <tr key={story.key} className="hover:bg-muted/30 transition-smooth">
-                    <td className="px-6 py-4">
-                      <span className="font-mono text-sm font-medium text-primary">{story.key}</span>
+                    <td className="px-4 md:px-6 py-3 md:py-4">
+                      <span className="font-mono text-xs md:text-sm font-medium text-primary">{story.key}</span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-foreground">{story.summary}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-3 md:py-4 text-xs md:text-sm text-foreground">{story.summary}</td>
+                    <td className="px-4 md:px-6 py-3 md:py-4">
                       <ScoreBadge score={story.score} size="sm" />
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-3 md:py-4">
                       <span className="px-2 py-1 rounded-md text-xs font-medium bg-muted text-muted-foreground">
                         {story.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button variant="outline" size="sm">
+                    <td className="px-4 md:px-6 py-3 md:py-4 text-right">
+                      <Button variant="outline" size="sm" className="text-xs">
                         View Rating
                       </Button>
                     </td>
