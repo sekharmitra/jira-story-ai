@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Plus, Settings, ExternalLink, TrendingUp } from "lucide-react";
+import { ProjectWizard } from "@/components/ProjectWizard";
 
 const projects = [
   { 
@@ -30,6 +32,22 @@ const projects = [
 ];
 
 const Projects = () => {
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardMode, setWizardMode] = useState<"add" | "edit">("add");
+  const [selectedProject, setSelectedProject] = useState<{ name: string; key: string } | undefined>();
+
+  const handleAddProject = () => {
+    setWizardMode("add");
+    setSelectedProject(undefined);
+    setWizardOpen(true);
+  };
+
+  const handleConfigureProject = (project: { name: string; key: string }) => {
+    setWizardMode("edit");
+    setSelectedProject(project);
+    setWizardOpen(true);
+  };
+
   return (
     <Layout>
       <div className="p-8">
@@ -39,7 +57,7 @@ const Projects = () => {
             <h1 className="text-3xl font-bold text-foreground mb-2">Projects</h1>
             <p className="text-muted-foreground">Manage your connected Jira projects</p>
           </div>
-          <Button className="gradient-primary text-white gap-2 shadow-custom-md">
+          <Button onClick={handleAddProject} className="gradient-primary text-white gap-2 shadow-custom-md">
             <Plus className="w-4 h-4" />
             Add Project
           </Button>
@@ -82,7 +100,12 @@ const Projects = () => {
                   <ExternalLink className="w-4 h-4" />
                   Open
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1 gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1 gap-2"
+                  onClick={() => handleConfigureProject({ name: project.name, key: project.key })}
+                >
                   <Settings className="w-4 h-4" />
                   Configure
                 </Button>
@@ -99,12 +122,19 @@ const Projects = () => {
               Connect additional Jira projects to expand your AI-powered story rating capabilities. 
               Our 5-step wizard makes integration seamless and quick.
             </p>
-            <Button className="gradient-primary text-white gap-2 shadow-custom-md">
+            <Button onClick={handleAddProject} className="gradient-primary text-white gap-2 shadow-custom-md">
               <Plus className="w-4 h-4" />
               Start Project Setup
             </Button>
           </div>
         </div>
+
+        <ProjectWizard
+          open={wizardOpen}
+          onOpenChange={setWizardOpen}
+          mode={wizardMode}
+          project={selectedProject}
+        />
       </div>
     </Layout>
   );

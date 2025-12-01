@@ -1,0 +1,333 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { ChevronLeft, ChevronRight, Check, Upload } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface ProjectWizardProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  mode: "add" | "edit";
+  project?: {
+    name: string;
+    key: string;
+  };
+}
+
+const steps = [
+  { id: 1, title: "Connect Jira" },
+  { id: 2, title: "Select Projects" },
+  { id: 3, title: "Field Mapping" },
+  { id: 4, title: "Rating Rubric" },
+  { id: 5, title: "Domain Context" },
+];
+
+const rubricDimensions = [
+  { id: "clarity", name: "Clarity", defaultWeight: 20 },
+  { id: "completeness", name: "Completeness", defaultWeight: 25 },
+  { id: "acceptance", name: "Acceptance Criteria", defaultWeight: 25 },
+  { id: "testability", name: "Testability", defaultWeight: 15 },
+  { id: "estimation", name: "Estimation Quality", defaultWeight: 15 },
+];
+
+const fieldMappings = [
+  { field: "Description", jiraField: "description", required: true },
+  { field: "Acceptance Criteria", jiraField: "customfield_10001", required: true },
+  { field: "Story Points", jiraField: "customfield_10002", required: false },
+  { field: "Epic Link", jiraField: "customfield_10003", required: false },
+];
+
+export const ProjectWizard = ({ open, onOpenChange, mode, project }: ProjectWizardProps) => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [jiraUrl, setJiraUrl] = useState("");
+  const [apiToken, setApiToken] = useState("");
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+  const [domainContext, setDomainContext] = useState("");
+  const [rubricConfig, setRubricConfig] = useState(
+    rubricDimensions.map((d) => ({ ...d, enabled: true, weight: d.defaultWeight }))
+  );
+  const { toast } = useToast();
+
+  const handleNext = () => {
+    if (currentStep < 5) setCurrentStep(currentStep + 1);
+  };
+
+  const handlePrev = () => {
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
+  };
+
+  const handleComplete = () => {
+    toast({
+      title: mode === "add" ? "Project Added" : "Project Updated",
+      description: `Successfully ${mode === "add" ? "connected" : "updated"} your Jira project.`,
+    });
+    onOpenChange(false);
+    setCurrentStep(1);
+  };
+
+  const handleWeightChange = (id: string, value: number[]) => {
+    setRubricConfig((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, weight: value[0] } : item))
+    );
+  };
+
+  const handleToggleDimension = (id: string, enabled: boolean) => {
+    setRubricConfig((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, enabled } : item))
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-foreground">
+            {mode === "add" ? "Add New Project" : `Configure ${project?.name}`}
+          </DialogTitle>
+        </DialogHeader>
+
+        {/* Progress Indicator */}
+        <div className="flex items-center justify-between mb-8">
+          {steps.map((step, idx) => (
+            <div key={step.id} className="flex items-center flex-1">
+              <div className="flex flex-col items-center flex-1">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-smooth ${
+                    currentStep > step.id
+                      ? "bg-primary text-primary-foreground"
+                      : currentStep === step.id
+                      ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                      : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {currentStep > step.id ? <Check className="w-5 h-5" /> : step.id}
+                </div>
+                <span className="text-xs mt-2 text-center text-muted-foreground font-medium">
+                  {step.title}
+                </span>
+              </div>
+              {idx < steps.length - 1 && (
+                <div
+                  className={`h-0.5 flex-1 transition-smooth ${
+                    currentStep > step.id ? "bg-primary" : "bg-border"
+                  }`}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Step Content */}
+        <div className="min-h-[400px]">
+          {currentStep === 1 && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-4">Connect to Jira</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Enter your Jira instance details to establish the connection.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="jira-url">Jira Instance URL</Label>
+                  <Input
+                    id="jira-url"
+                    placeholder="https://your-domain.atlassian.net"
+                    value={jiraUrl}
+                    onChange={(e) => setJiraUrl(e.target.value)}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="api-token">API Token</Label>
+                  <Input
+                    id="api-token"
+                    type="password"
+                    placeholder="Enter your Jira API token"
+                    value={apiToken}
+                    onChange={(e) => setApiToken(e.target.value)}
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Generate an API token from your Atlassian account settings
+                  </p>
+                </div>
+                <Button variant="outline" className="w-full gap-2">
+                  Test Connection
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 2 && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-4">Select Projects</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Choose which Jira projects you want to analyze and rate.
+                </p>
+              </div>
+              <div className="space-y-3">
+                {["E-Commerce Platform (ECOM)", "Mobile App (MOBILE)", "Analytics Dashboard (DASH)", "Customer Portal (PORTAL)", "Admin Console (ADMIN)"].map((proj) => (
+                  <label
+                    key={proj}
+                    className="flex items-center gap-3 p-4 border border-border rounded-lg hover:bg-muted/50 cursor-pointer transition-smooth"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedProjects.includes(proj)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedProjects([...selectedProjects, proj]);
+                        } else {
+                          setSelectedProjects(selectedProjects.filter((p) => p !== proj));
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm font-medium text-foreground">{proj}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 3 && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-4">Field Mapping</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Map your Jira custom fields to our rating dimensions.
+                </p>
+              </div>
+              <div className="space-y-4">
+                {fieldMappings.map((mapping) => (
+                  <div key={mapping.field} className="grid grid-cols-2 gap-4 items-center">
+                    <div>
+                      <Label className="text-sm font-medium text-foreground">
+                        {mapping.field}
+                        {mapping.required && <span className="text-destructive ml-1">*</span>}
+                      </Label>
+                    </div>
+                    <Input
+                      defaultValue={mapping.jiraField}
+                      placeholder="Jira field ID"
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 4 && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-4">Rating Rubric</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Configure the dimensions and weights for story quality scoring.
+                </p>
+              </div>
+              <div className="space-y-6">
+                {rubricConfig.map((dimension) => (
+                  <div key={dimension.id} className="p-4 border border-border rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <Switch
+                          checked={dimension.enabled}
+                          onCheckedChange={(checked) => handleToggleDimension(dimension.id, checked)}
+                        />
+                        <Label className="text-sm font-semibold text-foreground">
+                          {dimension.name}
+                        </Label>
+                      </div>
+                      <span className="text-sm font-bold text-primary">{dimension.weight}%</span>
+                    </div>
+                    {dimension.enabled && (
+                      <Slider
+                        value={[dimension.weight]}
+                        onValueChange={(value) => handleWeightChange(dimension.id, value)}
+                        min={0}
+                        max={100}
+                        step={5}
+                        className="mt-2"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 5 && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-4">Domain Context</h3>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Provide domain-specific context to improve AI rating accuracy.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="domain-context">Domain Description & Glossary</Label>
+                  <Textarea
+                    id="domain-context"
+                    placeholder="Describe your product domain, technical context, and any domain-specific terminology..."
+                    value={domainContext}
+                    onChange={(e) => setDomainContext(e.target.value)}
+                    rows={8}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label>Upload Sample Stories (Optional)</Label>
+                  <div className="mt-2 border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-smooth cursor-pointer">
+                    <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      Drop files here or click to upload
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      CSV, JSON, or TXT files with example user stories
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between pt-6 border-t border-border">
+          <Button
+            variant="outline"
+            onClick={handlePrev}
+            disabled={currentStep === 1}
+            className="gap-2"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Previous
+          </Button>
+          <div className="text-sm text-muted-foreground">
+            Step {currentStep} of {steps.length}
+          </div>
+          {currentStep < 5 ? (
+            <Button onClick={handleNext} className="gap-2">
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button onClick={handleComplete} className="gap-2">
+              <Check className="w-4 h-4" />
+              Complete
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
