@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { ChevronLeft, ChevronRight, Check, Upload } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, Upload, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProjectWizardProps {
@@ -51,6 +51,7 @@ export const ProjectWizard = ({ open, onOpenChange, mode, project }: ProjectWiza
   const [rubricConfig, setRubricConfig] = useState(
     rubricDimensions.map((d) => ({ ...d, enabled: true, weight: d.defaultWeight }))
   );
+  const [newDimensionName, setNewDimensionName] = useState("");
   const { toast } = useToast();
 
   const handleNext = () => {
@@ -80,6 +81,21 @@ export const ProjectWizard = ({ open, onOpenChange, mode, project }: ProjectWiza
     setRubricConfig((prev) =>
       prev.map((item) => (item.id === id ? { ...item, enabled } : item))
     );
+  };
+
+  const handleAddDimension = () => {
+    if (newDimensionName.trim()) {
+      const newId = newDimensionName.toLowerCase().replace(/\s+/g, "_");
+      setRubricConfig([
+        ...rubricConfig,
+        { id: newId, name: newDimensionName, defaultWeight: 10, weight: 10, enabled: true },
+      ]);
+      setNewDimensionName("");
+    }
+  };
+
+  const handleRemoveDimension = (id: string) => {
+    setRubricConfig(rubricConfig.filter((item) => item.id !== id));
   };
 
   return (
@@ -228,25 +244,49 @@ export const ProjectWizard = ({ open, onOpenChange, mode, project }: ProjectWiza
           {currentStep === 4 && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-4">Rating Rubric</h3>
-                <p className="text-sm text-muted-foreground mb-6">
-                  Configure the dimensions and weights for story quality scoring.
+                <h3 className="text-lg font-semibold text-foreground mb-4">
+                  Project-Specific Rubric
+                </h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Customize rubric dimensions for this project. You can add custom dimensions or
+                  remove existing ones.
+                </p>
+                <p className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-md border border-border">
+                  💡 These are based on your base rubric from Settings. Changes here only affect
+                  this project.
                 </p>
               </div>
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {rubricConfig.map((dimension) => (
-                  <div key={dimension.id} className="p-4 border border-border rounded-lg">
-                    <div className="flex items-center justify-between mb-4">
+                  <div
+                    key={dimension.id}
+                    className="p-4 border border-border rounded-lg space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Switch
                           checked={dimension.enabled}
-                          onCheckedChange={(checked) => handleToggleDimension(dimension.id, checked)}
+                          onCheckedChange={(checked) =>
+                            handleToggleDimension(dimension.id, checked)
+                          }
                         />
                         <Label className="text-sm font-semibold text-foreground">
                           {dimension.name}
                         </Label>
                       </div>
-                      <span className="text-sm font-bold text-primary">{dimension.weight}%</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-primary">
+                          {dimension.weight}%
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveDimension(dimension.id)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                     {dimension.enabled && (
                       <Slider
@@ -255,11 +295,24 @@ export const ProjectWizard = ({ open, onOpenChange, mode, project }: ProjectWiza
                         min={0}
                         max={100}
                         step={5}
-                        className="mt-2"
                       />
                     )}
                   </div>
                 ))}
+
+                {/* Add Custom Dimension */}
+                <div className="flex gap-2 pt-2">
+                  <Input
+                    placeholder="Add custom dimension..."
+                    value={newDimensionName}
+                    onChange={(e) => setNewDimensionName(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleAddDimension()}
+                  />
+                  <Button onClick={handleAddDimension} variant="outline" className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Add
+                  </Button>
+                </div>
               </div>
             </div>
           )}

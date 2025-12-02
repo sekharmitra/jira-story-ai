@@ -4,9 +4,47 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Key, Cpu, Shield, Users } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Save, Key, Cpu, Shield, Users, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 const Settings = () => {
+  const [baseRubric, setBaseRubric] = useState([
+    { id: "clarity", name: "Clarity", weight: 20, enabled: true },
+    { id: "completeness", name: "Completeness", weight: 25, enabled: true },
+    { id: "acceptance", name: "Acceptance Criteria", weight: 25, enabled: true },
+    { id: "testability", name: "Testability", weight: 15, enabled: true },
+    { id: "estimation", name: "Estimation Quality", weight: 15, enabled: true },
+  ]);
+  const [newDimensionName, setNewDimensionName] = useState("");
+
+  const handleAddDimension = () => {
+    if (newDimensionName.trim()) {
+      const newId = newDimensionName.toLowerCase().replace(/\s+/g, "_");
+      setBaseRubric([
+        ...baseRubric,
+        { id: newId, name: newDimensionName, weight: 10, enabled: true },
+      ]);
+      setNewDimensionName("");
+    }
+  };
+
+  const handleRemoveDimension = (id: string) => {
+    setBaseRubric(baseRubric.filter((d) => d.id !== id));
+  };
+
+  const handleWeightChange = (id: string, value: number[]) => {
+    setBaseRubric(
+      baseRubric.map((d) => (d.id === id ? { ...d, weight: value[0] } : d))
+    );
+  };
+
+  const handleToggleDimension = (id: string, enabled: boolean) => {
+    setBaseRubric(
+      baseRubric.map((d) => (d.id === id ? { ...d, enabled } : d))
+    );
+  };
+
   return (
     <Layout>
       <div className="p-4 md:p-6 lg:p-8">
@@ -114,41 +152,81 @@ const Settings = () => {
 
           {/* Rubric */}
           <TabsContent value="rubric">
-            <div className="bg-card rounded-xl shadow-custom-md border border-border p-6">
-              <div className="flex items-center gap-3 mb-6">
+            <div className="bg-card rounded-xl shadow-custom-md border border-border p-4 md:p-6">
+              <div className="flex items-center gap-3 mb-4">
                 <Shield className="w-5 h-5 text-primary" />
-                <h2 className="text-xl font-semibold text-foreground">Rating Rubric Configuration</h2>
+                <div>
+                  <h2 className="text-xl font-semibold text-foreground">Base Rating Rubric</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Define the default rubric dimensions. Projects can customize these further.
+                  </p>
+                </div>
               </div>
 
               <div className="space-y-4 max-w-2xl">
-                {[
-                  { name: "Clarity", weight: 25, enabled: true },
-                  { name: "Completeness", weight: 20, enabled: true },
-                  { name: "Acceptance Criteria", weight: 25, enabled: true },
-                  { name: "Testability", weight: 15, enabled: true },
-                  { name: "Independence", weight: 15, enabled: true },
-                ].map((dimension) => (
-                  <div key={dimension.name} className="flex items-center justify-between p-4 border border-border rounded-lg">
-                    <div className="flex items-center gap-4">
-                      <Switch checked={dimension.enabled} />
-                      <div>
-                        <p className="font-medium text-foreground">{dimension.name}</p>
-                        <p className="text-sm text-muted-foreground">Weight: {dimension.weight}%</p>
+                {baseRubric.map((dimension) => (
+                  <div
+                    key={dimension.id}
+                    className="p-4 border border-border rounded-lg space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Switch
+                          checked={dimension.enabled}
+                          onCheckedChange={(checked) =>
+                            handleToggleDimension(dimension.id, checked)
+                          }
+                        />
+                        <div>
+                          <p className="font-medium text-foreground">{dimension.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Weight: {dimension.weight}%
+                          </p>
+                        </div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveDimension(dimension.id)}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
-                    <Input
-                      type="number"
-                      value={dimension.weight}
-                      className="w-20"
-                      min="0"
-                      max="100"
-                    />
+                    {dimension.enabled && (
+                      <Slider
+                        value={[dimension.weight]}
+                        onValueChange={(value) => handleWeightChange(dimension.id, value)}
+                        min={0}
+                        max={100}
+                        step={5}
+                        className="mt-2"
+                      />
+                    )}
                   </div>
                 ))}
 
+                {/* Add New Dimension */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="New dimension name..."
+                    value={newDimensionName}
+                    onChange={(e) => setNewDimensionName(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleAddDimension()}
+                  />
+                  <Button
+                    onClick={handleAddDimension}
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add
+                  </Button>
+                </div>
+
                 <Button className="gradient-primary text-white gap-2 shadow-custom-md mt-6">
                   <Save className="w-4 h-4" />
-                  Save Rubric
+                  Save Base Rubric
                 </Button>
               </div>
             </div>
