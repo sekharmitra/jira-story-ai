@@ -22,7 +22,7 @@ export const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen flex w-full bg-background">
       {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      <div className={cn("lg:hidden fixed top-4 z-50", sidebarOpen ? "right-4" : "left-4")}>
         <Button
           variant="outline"
           size="icon"

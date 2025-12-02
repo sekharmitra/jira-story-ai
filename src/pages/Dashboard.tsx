@@ -3,7 +3,7 @@ import { KPICard } from "@/components/KPICard";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Award, AlertTriangle, TrendingUp, Calendar, Filter } from "lucide-react";
+import { Award, AlertTriangle, Calendar } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import { useState } from "react";
 
@@ -144,14 +144,6 @@ const Dashboard = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="outline" className="gap-2">
-                <Filter className="w-4 h-4" />
-                Filter
-              </Button>
-              <Button className="gradient-primary text-white gap-2 shadow-custom-md">
-                <TrendingUp className="w-4 h-4" />
-                Evaluate Stories
-              </Button>
             </div>
           </div>
         </div>

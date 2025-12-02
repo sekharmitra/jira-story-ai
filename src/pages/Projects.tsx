@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Plus, Settings, ExternalLink, TrendingUp } from "lucide-react";
-import { ProjectWizard } from "@/components/ProjectWizard";
 
 const projects = [
   { 
@@ -32,20 +31,14 @@ const projects = [
 ];
 
 const Projects = () => {
-  const [wizardOpen, setWizardOpen] = useState(false);
-  const [wizardMode, setWizardMode] = useState<"add" | "edit">("add");
-  const [selectedProject, setSelectedProject] = useState<{ name: string; key: string } | undefined>();
+  const navigate = useNavigate();
 
   const handleAddProject = () => {
-    setWizardMode("add");
-    setSelectedProject(undefined);
-    setWizardOpen(true);
+    navigate("/project-wizard?mode=add");
   };
 
   const handleConfigureProject = (project: { name: string; key: string }) => {
-    setWizardMode("edit");
-    setSelectedProject(project);
-    setWizardOpen(true);
+    navigate(`/project-wizard?mode=edit&project=${encodeURIComponent(project.name)}&key=${project.key}`);
   };
 
   return (
@@ -128,13 +121,6 @@ const Projects = () => {
             </Button>
           </div>
         </div>
-
-        <ProjectWizard
-          open={wizardOpen}
-          onOpenChange={setWizardOpen}
-          mode={wizardMode}
-          project={selectedProject}
-        />
       </div>
     </Layout>
   );
