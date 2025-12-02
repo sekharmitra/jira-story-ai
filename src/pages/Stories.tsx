@@ -2,56 +2,86 @@ import { Layout } from "@/components/Layout";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter, RefreshCw, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
-const stories = [
-  { key: "ABC-101", summary: "As a user, I want to login with email", score: 85, sprint: "Sprint 6", status: "Done", lastRated: "2 hours ago" },
-  { key: "ABC-102", summary: "Implement user profile page", score: 72, sprint: "Sprint 6", status: "In Progress", lastRated: "3 hours ago" },
-  { key: "ABC-103", summary: "Add search functionality to dashboard", score: 68, sprint: "Sprint 5", status: "In Progress", lastRated: "5 hours ago" },
-  { key: "ABC-104", summary: "Fix bug in payment flow", score: 45, sprint: "Sprint 6", status: "To Do", lastRated: "1 day ago" },
-  { key: "ABC-105", summary: "As an admin, I want to manage users", score: 88, sprint: "Sprint 5", status: "Done", lastRated: "2 days ago" },
-  { key: "ABC-106", summary: "Create reporting dashboard", score: 55, sprint: "Sprint 6", status: "To Do", lastRated: "3 days ago" },
-  { key: "ABC-107", summary: "Integrate third-party analytics", score: 78, sprint: "Sprint 5", status: "In Progress", lastRated: "4 hours ago" },
-  { key: "ABC-108", summary: "Update user settings page", score: 42, sprint: "Sprint 6", status: "To Do", lastRated: "1 day ago" },
+type Story = {
+  key: string;
+  summary: string;
+  score: number;
+  sprint: string;
+  status: string;
+  lastRated: string;
+};
+
+const projects = [
+  { key: "ECOM", name: "E-Commerce Platform" },
+  { key: "MOBILE", name: "Mobile App" },
+  { key: "DASH", name: "Analytics Dashboard" },
+  { key: "PORTAL", name: "Customer Portal" },
 ];
+
+const storiesByProject: Record<string, Story[]> = {
+  "ECOM": [
+    { key: "ECOM-101", summary: "As a user, I want to login with email", score: 85, sprint: "Sprint 6", status: "Done", lastRated: "2 hours ago" },
+    { key: "ECOM-102", summary: "Implement user profile page", score: 72, sprint: "Sprint 6", status: "In Progress", lastRated: "3 hours ago" },
+    { key: "ECOM-103", summary: "Add search functionality to dashboard", score: 68, sprint: "Sprint 5", status: "In Progress", lastRated: "5 hours ago" },
+    { key: "ECOM-104", summary: "Fix bug in payment flow", score: 45, sprint: "Sprint 6", status: "To Do", lastRated: "1 day ago" },
+  ],
+  "MOBILE": [
+    { key: "MOBILE-101", summary: "As an admin, I want to manage users", score: 88, sprint: "Sprint 5", status: "Done", lastRated: "2 days ago" },
+    { key: "MOBILE-102", summary: "Create reporting dashboard", score: 55, sprint: "Sprint 6", status: "To Do", lastRated: "3 days ago" },
+    { key: "MOBILE-103", summary: "Integrate third-party analytics", score: 78, sprint: "Sprint 5", status: "In Progress", lastRated: "4 hours ago" },
+  ],
+  "DASH": [
+    { key: "DASH-101", summary: "Update user settings page", score: 42, sprint: "Sprint 6", status: "To Do", lastRated: "1 day ago" },
+    { key: "DASH-102", summary: "Add real-time data updates", score: 91, sprint: "Sprint 7", status: "Done", lastRated: "1 hour ago" },
+  ],
+  "PORTAL": [
+    { key: "PORTAL-101", summary: "Implement customer feedback form", score: 76, sprint: "Sprint 5", status: "In Progress", lastRated: "6 hours ago" },
+  ],
+};
 
 const Stories = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isReratingAll, setIsReratingAll] = useState(false);
-  const [reratingStory, setReratingStory] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<string>("ECOM");
+  const [isEvaluatingAll, setIsEvaluatingAll] = useState(false);
+  const [evaluatingStory, setEvaluatingStory] = useState<string | null>(null);
+  
+  const currentStories = storiesByProject[selectedProject] || [];
 
-  const handleRerateStory = (storyKey: string) => {
-    setReratingStory(storyKey);
+  const handleEvaluateStory = (storyKey: string) => {
+    setEvaluatingStory(storyKey);
     toast({
-      title: "Re-rating story",
+      title: "Evaluating story",
       description: `Analyzing ${storyKey}...`,
     });
     
     setTimeout(() => {
-      setReratingStory(null);
+      setEvaluatingStory(null);
       toast({
-        title: "Story re-rated successfully",
+        title: "Story evaluated successfully",
         description: `${storyKey} has been analyzed and scored.`,
       });
     }, 2000);
   };
 
-  const handleRerateAll = () => {
-    setIsReratingAll(true);
+  const handleEvaluateAll = () => {
+    setIsEvaluatingAll(true);
     toast({
-      title: "Re-rating all stories",
+      title: "Evaluating all stories",
       description: "This may take a few minutes...",
     });
     
     setTimeout(() => {
-      setIsReratingAll(false);
+      setIsEvaluatingAll(false);
       toast({
-        title: "All stories re-rated",
-        description: `Successfully analyzed ${stories.length} stories.`,
+        title: "All stories evaluated",
+        description: `Successfully analyzed ${currentStories.length} stories.`,
       });
     }, 3000);
   };
@@ -61,8 +91,26 @@ const Stories = () => {
       <div className="p-4 md:p-6 lg:p-8">
         {/* Header */}
         <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">User Stories</h1>
-          <p className="text-sm md:text-base text-muted-foreground">View and manage AI-rated user stories</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">User Stories</h1>
+              <p className="text-sm md:text-base text-muted-foreground">View and manage AI-rated user stories</p>
+            </div>
+            <div className="w-full md:w-64">
+              <Select value={selectedProject} onValueChange={setSelectedProject}>
+                <SelectTrigger className="h-12 bg-card border-border">
+                  <SelectValue placeholder="Select project" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((project) => (
+                    <SelectItem key={project.key} value={project.key}>
+                      {project.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
         {/* Filters */}
@@ -83,11 +131,11 @@ const Stories = () => {
             </Button>
             <Button 
               className="gradient-primary text-white gap-2 shadow-custom-md"
-              onClick={handleRerateAll}
-              disabled={isReratingAll}
+              onClick={handleEvaluateAll}
+              disabled={isEvaluatingAll}
             >
-              <RefreshCw className={`w-4 h-4 ${isReratingAll ? 'animate-spin' : ''}`} />
-              {isReratingAll ? 'Re-rating...' : 'Re-rate All'}
+              <RefreshCw className={`w-4 h-4 ${isEvaluatingAll ? 'animate-spin' : ''}`} />
+              {isEvaluatingAll ? 'Evaluating...' : 'Evaluate All'}
             </Button>
           </div>
 
@@ -118,7 +166,7 @@ const Stories = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {stories.map((story) => (
+                {currentStories.map((story) => (
                   <tr key={story.key} className="hover:bg-muted/30 transition-smooth cursor-pointer">
                     <td className="px-3 md:px-6 py-3 md:py-4">
                       <span className="font-mono text-xs md:text-sm font-medium text-primary">{story.key}</span>
@@ -151,12 +199,12 @@ const Stories = () => {
                           className="gap-2 text-xs"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleRerateStory(story.key);
+                            handleEvaluateStory(story.key);
                           }}
-                          disabled={reratingStory === story.key}
+                          disabled={evaluatingStory === story.key}
                         >
-                          <RefreshCw className={`w-3 md:w-4 h-3 md:h-4 ${reratingStory === story.key ? 'animate-spin' : ''}`} />
-                          <span className="hidden sm:inline">{reratingStory === story.key ? 'Rating...' : 'Re-rate'}</span>
+                          <RefreshCw className={`w-3 md:w-4 h-3 md:h-4 ${evaluatingStory === story.key ? 'animate-spin' : ''}`} />
+                          <span className="hidden sm:inline">{evaluatingStory === story.key ? 'Evaluating...' : 'Evaluate'}</span>
                         </Button>
                       </div>
                     </td>
@@ -168,7 +216,9 @@ const Stories = () => {
 
           {/* Pagination */}
           <div className="px-4 md:px-6 py-4 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-xs md:text-sm text-muted-foreground">Showing 8 of 127 stories</p>
+            <p className="text-xs md:text-sm text-muted-foreground">
+              Showing {currentStories.length} {currentStories.length === 1 ? 'story' : 'stories'}
+            </p>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" className="text-xs">Previous</Button>
               <Button variant="outline" size="sm" className="text-xs">Next</Button>
